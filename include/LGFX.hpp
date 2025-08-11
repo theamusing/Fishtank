@@ -25,9 +25,9 @@ public:
       p.pin_cs   = 5;
       p.pin_rst  = 4;
       p.pin_busy = -1;
-      p.memory_width  = 240;
+      p.memory_width  = 320;
       p.memory_height = 240;
-      p.panel_width   = 240;
+      p.panel_width   = 320;
       p.panel_height  = 240;
       p.offset_x = 0;
       p.offset_y = 0;

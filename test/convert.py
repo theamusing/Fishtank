@@ -19,10 +19,9 @@ def image_to_rgb565_bytes(img: Image.Image) -> bytes:
     r = (rgb[:, :, 0] >> 3).astype(np.uint16) << 11
     g = (rgb[:, :, 1] >> 2).astype(np.uint16) << 5
     b = (rgb[:, :, 2] >> 3).astype(np.uint16)
-    rgb565 = (r | g | b).flatten()
+    rgb565 = (r | g | b).flatten().astype('>u2')
 
-    header = struct.pack("<HH", w, h)
-    return header + rgb565.tobytes()
+    return rgb565.tobytes()
 
 def save_single_png(png_path: Path, out_path: Path):
     """Save one PNG -> .bin. out_path can be file or directory."""

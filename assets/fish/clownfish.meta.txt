@@ -1,0 +1,12 @@
+input_kind: png_folder
+source: assets\fish\clownfish
+width: 20
+height: 12
+frames: 5
+frame_stride: 240  # 每帧像素数（H*W）= 索引数
+total_indices_written: 1200
+colormap_nontransparent_colors: 37
+indices_used_count: 5
+indices_used_sorted: [4, 11, 13, 14, 15]
+index_meaning: 0=transparent; 1..n = position in colormap.png from left to right
+index_bin: clownfish.bin

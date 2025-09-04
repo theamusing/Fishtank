@@ -1,0 +1,12 @@
+input_kind: single_png
+source: assets\scene\fg.png
+width: 160
+height: 40
+frames: 1
+frame_stride: 6400  # 每帧像素数（H*W）= 索引数
+total_indices_written: 6400
+colormap_nontransparent_colors: 37
+indices_used_count: 11
+indices_used_sorted: [4, 6, 21, 22, 27, 29, 31, 33, 35, 36, 37]
+index_meaning: 0=transparent; 1..n = position in colormap.png from left to right
+index_bin: fg.bin

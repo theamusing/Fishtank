@@ -9,10 +9,16 @@
 #include "spriteData.hpp"
 #include "colorMap.hpp"
 #include "gameObject.hpp"
+#include "fish.hpp"
 
 Renderer renderer;
-SpriteData spriteData("/eye/test.bin");
+SpriteData bgData, fgData, clownfishData, longfishData, guppyData;
 ColorMap colorMap;
+GameObject<160, 120> bg;
+GameObject<160, 40> fg;
+ClownFish clownfish;
+std::vector<Guppy> guppies;
+LongFish longfish;
 
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels)
 {
@@ -79,27 +85,34 @@ void setup()
     Serial.begin(2000000);
     delay(3000);
     Serial.println("Serial started");
-    if (!LittleFS.begin())
+    LittleFS.begin();
+
+    renderer.setup();
+
+    bgData.setup("/bg.bin");
+    fgData.setup("/fg.bin");
+
+    clownfishData.setup("/fish/clownfish.bin");
+    longfishData.setup("/fish/longfish.bin");
+    guppyData.setup("/fish/guppy.bin");
+
+    colorMap.setup("/colormaps/colormap.bin");
+    bg.setup();
+    fg.setup();
+
+    clownfish.setup();
+    longfish.setup();
+    for (int i = 0; i < 5; i++)
     {
-        Serial.println("LittleFS mount failed, try formatting...");
-        if (!LittleFS.begin(true))
-        {
-            Serial.println("LittleFS format failed");
-            return;
-        }
+        guppies.emplace_back();
+        guppies.back().setup();
     }
-    listDir(LittleFS, "/", 3);
-    if (psramInit())
+    clownfish.setPos(40, 40);
+    longfish.setPos(120, 80);
+    for (int i = 0; i < 5; i++)
     {
-        Serial.printf("PSRAM size: %d bytes\n", ESP.getPsramSize());
+        guppies[i].setPos(80 + i * 10, random(20, 100));
     }
-    else
-    {
-        Serial.println("PSRAM not available");
-    }
-    GameObject<64, 64> gameObject;
-    gameObject.setup();
-    gameObject.check();
 }
 
 void loop()
@@ -108,49 +121,31 @@ void loop()
 
     // ===== 绘制开始计时 =====
     uint32_t t0 = micros();
-    uint32_t now = millis();
 
-    // 计算渐变颜色（用正弦波平滑变化）
-    uint8_t r = (sin(now * 0.002f) * 0.5f + 0.5f) * 255;
-    uint8_t g = (sin(now * 0.002f + 2.094f) * 0.5f + 0.5f) * 255; // +120°
-    uint8_t b = (sin(now * 0.002f + 4.188f) * 0.5f + 0.5f) * 255; // +240°
-    renderer.m_fb.fillScreen(renderer.m_fb.color565(255, 128, 128));
+    // fill with blue
+    renderer.m_fb.fillScreen(renderer.m_fb.color565(128, 0, 0));
+    bg.setPos(80, 60);
+    bg.draw(renderer.m_fb, bgData, colorMap);
 
-    // 示例：一堆小圆点 + 一个移动圆，模拟负载
-    for (int i = 0; i < 50; ++i)
-    {
-        int x = esp_random() % RENDER_WIDTH;
-        int y = esp_random() % RENDER_HEIGHT;
-        renderer.m_fb.fillCircle(x, y, 3, renderer.m_fb.color565(64, 128, 255));
-    }
-    int t = millis();
-    int cx = (RENDER_WIDTH / 2) + (int)(sin(t * 0.003f) * (RENDER_WIDTH / 3));
-    int cy = (RENDER_HEIGHT / 2) + (int)(cos(t * 0.003f) * (RENDER_HEIGHT / 3));
-    renderer.m_fb.fillCircle(cx, cy, 50, renderer.m_fb.color565(255, 255, 255));
+    clownfish.update(frame_id);
+    clownfish.draw(renderer.m_fb, clownfishData, colorMap);
 
-    // draw a jpg file
-    // renderer.m_fb.drawJpgFile(LittleFS, "/eye/eye-0000.jpg", 0, 0);
-    File f = LittleFS.open("/eye/test.bin", "r");
-    if (!f)
+    longfish.update(frame_id);
+    longfish.draw(renderer.m_fb, longfishData, colorMap);
+
+    for (auto &guppy : guppies)
     {
-        Serial.println("Failed to open image file");
-        return;
+        guppy.update(frame_id);
+        guppy.draw(renderer.m_fb, guppyData, colorMap);
     }
-    t0 = micros();
-    // 分配内存
-    uint16_t *buf = (uint16_t *)ps_malloc(64 * 64 * 2);
-    if (!buf)
-    {
-        Serial.println("Malloc failed");
-        return;
-    }
-    f.read((uint8_t *)buf, 64 * 64 * 2);
-    renderer.m_fb.pushImageRotateZoom(0, 0, 0, 0, 0, 2, 2, 64, 64, buf);
-    //   renderer.m_fb.pushImage(0, 0, 64, 64, buf);
+
+    fg.setPos(80, 100);
+    fg.draw(renderer.m_fb, fgData, colorMap);
+
     float t3 = (millis() % 10000) / 10000.0f; // 0~1
 
     // 亮度曲线（白天亮，晚上暗）
-    float brightness = 0.6f + 0.4f * sin(t3 * 2 * M_PI);
+    float brightness = max(1.0f + 0.2f * sin(t3 * 2 * M_PI), 1.0);
 
     // 色温曲线（傍晚偏暖，夜晚偏冷）
     float r_scale = 1.0f;
@@ -160,8 +155,5 @@ void loop()
     applyDayNight(renderer.m_fb, brightness, r_scale, g_scale, b_scale);
 
     uint32_t draw_us = micros() - t0;
-    // uint32_t draw_us = micros() - t0;
-    //   renderer.drawFrame(draw_us, frame_id++);
-    f.close();
-    free(buf);
+    renderer.drawFrame(draw_us, frame_id++);
 }

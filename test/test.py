@@ -70,9 +70,9 @@ while True:
 
     # ===== C) 显示计时 =====
     t_show_start = time.perf_counter()
-    k = 2  # 放大倍数
-    # big = cv2.resize(bgr, None, fx=k, fy=k, interpolation=cv2.INTER_NEAREST)
-    big = upscale_pixel_round(bgr)
+    k = 5  # 放大倍数
+    big = cv2.resize(bgr, None, fx=k, fy=k, interpolation=cv2.INTER_NEAREST)
+    # big = upscale_pixel_round(bgr)
     cv2.imshow(f"ESP32 Frame x{k}", big)
     # cv2.imshow("ESP32 Frame", bgr)
     key = cv2.waitKey(1)

@@ -2,14 +2,12 @@
 
 #include "utils.hpp"
 
-#define COLOR_COUNT 64
-
+#define COLOR_COUNT 37
+#define COLOR_TRANSPARENT 0xF81F // 透明色
 class ColorMap
 {
 public:
-    ColorMap() : m_color(nullptr), m_size(0) {}
-
-    ColorMap(uint16_t *color, size_t size)
+    void setup(uint16_t *color, size_t size)
     {
         if (size != COLOR_COUNT * sizeof(uint16_t))
         {
@@ -24,7 +22,7 @@ public:
         }
     }
 
-    ColorMap(const char *path)
+    void setup(const char *path)
     {
         if (!loadFilePsram(path, m_color, m_size))
         {
@@ -36,7 +34,7 @@ public:
         }
     }
 
-    ColorMap(const ColorMap &c)
+    void copy(const ColorMap &c)
     {
         if (c.m_color)
         {
@@ -112,9 +110,10 @@ public:
 
     uint16_t getColor(uint8_t index) const
     {
-        if (!m_color || index >= COLOR_COUNT)
-            return 0;
-        return m_color[index];
+        uint16_t color = m_color[index-1];
+        if (!m_color || index == 0 || index > COLOR_COUNT)
+            return COLOR_TRANSPARENT;
+        return color;
     }
 
 private:

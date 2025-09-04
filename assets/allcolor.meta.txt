@@ -1,0 +1,6 @@
+width: 160
+height: 120
+num_colors: 37
+index_meaning: 0=transparent; 1..n = position in colormap.png from left to right
+colormap_png: allcolor.colormap.png
+index_bin: allcolor.index.u8.bin

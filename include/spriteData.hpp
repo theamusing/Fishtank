@@ -5,9 +5,7 @@
 class SpriteData
 {
 public:
-    SpriteData() : m_data(nullptr), m_size(0) {}
-
-    SpriteData(const char *path)
+    void setup(const char *path)
     {
         if (!loadFilePsram(path, m_data, m_size))
         {

@@ -1,0 +1,12 @@
+input_kind: single_png
+source: assets\scene\bg.png
+width: 160
+height: 120
+frames: 1
+frame_stride: 19200  # 每帧像素数（H*W）= 索引数
+total_indices_written: 19200
+colormap_nontransparent_colors: 37
+indices_used_count: 15
+indices_used_sorted: [1, 2, 3, 4, 5, 6, 16, 17, 18, 20, 21, 22, 34, 35, 36]
+index_meaning: 0=transparent; 1..n = position in colormap.png from left to right
+index_bin: bg.bin

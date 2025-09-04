@@ -13,17 +13,23 @@ template <size_t WIDTH, size_t HEIGHT>
 class GameObject
 {
 public:
-    void setup()
+    virtual void setup()
     {
         if (m_buffer == nullptr) {
+            Serial.println("malloc buffer!");
             m_buffer = (uint16_t*)ps_malloc(WIDTH * HEIGHT * 2);
         }
+        else
+        {
+            Serial.println("buffer already allocated");
+        }
     }
-    void update()
+    virtual void update(size_t frame)
     {
         // Update the game object's state
+        m_currentFrame = frame % FRAME_COUNT;
     }
-    void draw(LGFX_Sprite& sprite, SpriteData& spriteData, ColorMap& colorMap)
+    virtual void draw(LGFX_Sprite& sprite, SpriteData& spriteData, ColorMap& colorMap)
     {
         size_t offset = m_spriteOffset + m_currentFrame * WIDTH * HEIGHT;
         uint8_t* ptr = spriteData.getPtr(offset, WIDTH * HEIGHT);
@@ -37,7 +43,7 @@ public:
         }
 
         // draw
-        sprite.pushImageRotateZoom(m_posX, m_posY, WIDTH / 2, HEIGHT / 2, m_rotation, m_scale, m_scale, WIDTH, HEIGHT, m_buffer);
+        sprite.pushImageRotateZoom(m_posX, m_posY, WIDTH / 2, HEIGHT / 2, m_rotation, m_scaleX, m_scaleY, WIDTH, HEIGHT, m_buffer, COLOR_TRANSPARENT);
     }
 
     void setPos(int x, int y)
@@ -46,14 +52,25 @@ public:
         m_posY = y;
     }
 
-    void setScale(float scale)
+    void setScale(float scaleX, float scaleY)
     {
-        m_scale = scale;
+        m_scaleX = scaleX;
+        m_scaleY = scaleY;
     }
 
     void setRotation(float rotation)
     {
         m_rotation = rotation;
+    }
+
+    void setSpriteOffset(size_t offset)
+    {
+        m_spriteOffset = offset;
+    }
+
+    void setCurrentFrame(size_t frame)
+    {
+        m_currentFrame = frame;
     }
 
     void check()
@@ -65,15 +82,25 @@ public:
         }
     }
 
+    ~GameObject()
+    {
+        if (m_buffer)
+        {
+            free(m_buffer);
+            m_buffer = nullptr;
+        }
+    }
+
 protected:
     size_t FRAME_COUNT = 1;
     int m_posX = 0;
     int m_posY = 0;
-    float m_scale = 1.0f;
+    float m_scaleX = 1.0f;
+    float m_scaleY = 1.0f;
     float m_rotation = 0.0f;
 
     size_t m_spriteOffset = 0;
-    int m_currentFrame = 0;
+    size_t m_currentFrame = 0;
 
     static uint16_t* m_buffer;
 };

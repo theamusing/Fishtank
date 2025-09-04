@@ -1,0 +1,12 @@
+input_kind: png_folder
+source: assets\fish\longfish
+width: 19
+height: 6
+frames: 4
+frame_stride: 114  # 每帧像素数（H*W）= 索引数
+total_indices_written: 456
+colormap_nontransparent_colors: 37
+indices_used_count: 4
+indices_used_sorted: [11, 23, 24, 37]
+index_meaning: 0=transparent; 1..n = position in colormap.png from left to right
+index_bin: longfish.bin

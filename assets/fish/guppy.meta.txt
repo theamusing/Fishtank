@@ -1,0 +1,12 @@
+input_kind: png_folder
+source: assets\fish\guppy
+width: 16
+height: 10
+frames: 4
+frame_stride: 160  # 每帧像素数（H*W）= 索引数
+total_indices_written: 640
+colormap_nontransparent_colors: 37
+indices_used_count: 6
+indices_used_sorted: [11, 25, 26, 28, 30, 32]
+index_meaning: 0=transparent; 1..n = position in colormap.png from left to right
+index_bin: guppy.bin

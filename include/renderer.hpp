@@ -32,14 +32,17 @@ public:
         m_sp.setColorDepth(16);
         m_sp.createSprite(PHYSICAL_WIDTH, PHYSICAL_HEIGHT);
         m_sp.setSwapBytes(false);
+
         Serial.println("Sprite buffer created");
     }
 
     void drawFrame(uint32_t draw_us, uint32_t frame_id)
     {
         // sendFrameSerial(draw_us, frame_id);
+        uint32_t start = micros();
         render2lcd();
         Serial.println("render time: " + String(draw_us / 1000.0f) + " ms, frame id: " + String(frame_id));
+        Serial.println("push time: " + String((micros() - start) / 1000.0f) + " ms");
     }
 
 private:
@@ -77,7 +80,7 @@ private:
     void render2lcd()
     {
         m_fb.drawString("Hello Sprite", 10, 10);
-        m_sp.pushImageRotateZoom(0, 0, 0, 0, 0, float(PHYSICAL_WIDTH) / RENDER_WIDTH, float(PHYSICAL_HEIGHT) / RENDER_HEIGHT, RENDER_WIDTH, RENDER_HEIGHT, m_fb.getBuffer());
+        m_sp.pushImageRotateZoom(0, 0, 0, 0, 0, PHYSICAL_WIDTH/RENDER_WIDTH, PHYSICAL_HEIGHT/RENDER_HEIGHT, RENDER_WIDTH, RENDER_HEIGHT, (uint16_t*)m_fb.getBuffer());
         m_sp.pushSprite(0, 0);
     }
 };
